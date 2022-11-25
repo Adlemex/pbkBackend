@@ -19,8 +19,6 @@ app = FastAPI()
 #    return res[::-1]
 
 
-print(convert_base(33333, to_base=20))
-
 
 @app.get("/from_10")
 def from_10(sys: int, num: int):
