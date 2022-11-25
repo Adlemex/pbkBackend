@@ -1,13 +1,13 @@
 from typing import Union
 
 import fastapi
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
 
 
-#@app.get("/convert")
-#def convert_base(num: Union[int, str], to_base=10, from_base=10):
+# @app.get("/convert")
+# def convert_base(num: Union[int, str], to_base=10, from_base=10):
 #    # first convert to decimal number
 #    n = int(num, from_base) if isinstance(num, str) else num
 #    # now convert decimal to 'to_base' base
@@ -19,34 +19,101 @@ app = FastAPI()
 #    return res[::-1]
 
 
-
-@app.get("/from_10")
-def from_10(sys: int, num: int):
-    from_10.t = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+@app.get("/from_dec")
+def from_dec(num: int, to_base: int):
+    if to_base > 36: raise HTTPException(403, "Слишком большая система счисления")
+    from_dec.t = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     r = ''
-    steps = ""
+    steps = []
     while num:
-        steps += str(num) + ":" + str(sys) + " ост: " + str(divmod(num, sys)[1]) + "; "
-        num, y = divmod(num, sys)
-        r = from_10.t[y] + r
-    return r, steps
+        steps.append(str(num) + ":" + str(to_base) + " ост: " + str(divmod(num, to_base)[1]))
+        num, y = divmod(num, to_base)
+        r = from_dec.t[y] + r
+    return {"result": r, "steps": steps}
 
 
-@app.get("/to_10")
-def bin_dec(num: str, from_base: int):
-    table = {'0': 0, '1': 1, '2': 2, '3': 3,
-             '4': 4, '5': 5, '6': 6, '7': 7,
-             '8': 8, '9': 9, 'A': 10, 'B': 11,
-             'C': 12, 'D': 13, 'E': 14, 'F': 15}
-
-    hexadecimal = num
+@app.get("/to_dec")
+def to_dec(num: str, from_base: int):
+    if from_base > 36: raise HTTPException(403, "Слишком большая система счисления")
+    to_dec.t = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    n = num
     res = 0
-    steps = ""
+    steps = []
+    summa = []
     # computing max power value
-    size = len(hexadecimal) - 1
-
-    for num in hexadecimal:
-        steps += f"{table[num]} * {from_base}^{size} = {table[num] * from_base ** size}; "
-        res = res + table[num] * from_base ** size
+    size = len(n) - 1
+    for num in n:
+        if to_dec.t.index(num) >= from_base: raise HTTPException(403, "Недопустимое значение")
+        steps.append(f"{to_dec.t.index(num)} * {from_base}^{size} = {to_dec.t.index(num) * from_base ** size}")
+        res = res + to_dec.t.index(num) * from_base ** size
+        summa.append(str(to_dec.t.index(num) * from_base ** size))
         size = size - 1
-    return res, steps
+    steps.append(f"{' + '.join(summa)} = {res}")
+    return {"result": res, "steps": steps}
+
+
+@app.get("/sum")
+def sum(num1: str, num2: str, base1: int, base2: int):
+    steps = []
+    steps.append("Переводим первое число в десятичную систему")
+    if base1 != 10:
+        res = to_dec(num1, base1)
+        num1 = res.get("result")
+        steps += res.get("steps")
+    steps.append("Переводим второе число в десятичную систему")
+    if base2 != 10:
+        res2 = to_dec(num2, base2)
+        num2 = res2.get("result")
+        steps += res2.get("steps")
+    steps.append("Складываем полученные результаты")
+    return num1 + num2, steps
+
+
+@app.get("/multiplication")
+def multiplication(num1: str, num2: str, base1: int, base2: int):
+    steps = []
+    steps.append("Переводим первое число в десятичную систему")
+    if base1 != 10:
+        res = to_dec(num1, base1)
+        num1 = res.get("result")
+        steps += res.get("steps")
+    steps.append("Переводим второе число в десятичную систему")
+    if base2 != 10:
+        res2 = to_dec(num2, base2)
+        num2 = res2.get("result")
+        steps += res2.get("steps")
+    steps.append("Умножаем полученные результаты")
+    return num1 * num2, steps
+
+
+@app.get("/division")
+def division(num1: str, num2: str, base1: int, base2: int):
+    steps = []
+    steps.append("Переводим первое число в десятичную систему")
+    if base1 != 10:
+        res = to_dec(num1, base1)
+        num1 = res.get("result")
+        steps += res.get("steps")
+    steps.append("Переводим второе число в десятичную систему")
+    if base2 != 10:
+        res2 = to_dec(num2, base2)
+        num2 = res2.get("result")
+        steps += res2.get("steps")
+    steps.append("Делим полученные результаты")
+    return num1 / num2, steps
+
+@app.get("/subtraction")
+def subtraction(num1: str, num2: str, base1: int, base2: int):
+    steps = []
+    steps.append("Переводим первое число в десятичную систему")
+    if base1 != 10:
+        res = to_dec(num1, base1)
+        num1 = res.get("result")
+        steps += res.get("steps")
+    steps.append("Переводим второе число в десятичную систему")
+    if base2 != 10:
+        res2 = to_dec(num2, base2)
+        num2 = res2.get("result")
+        steps += res2.get("steps")
+    steps.append("Вычитаем полученные результаты")
+    return num1 - num2, steps

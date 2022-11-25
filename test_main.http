@@ -1,0 +1,35 @@
+
+GET http://127.0.0.1:8000/from_dec?num=123&to_base=2
+
+> {%
+client.test("Value right", function() {
+  client.assert(response.body.result == "1111011", "Value wrong");
+});
+%}
+
+###
+GET http://127.0.0.1:8000/from_dec?num=123&to_base=37
+
+> {%
+client.test("Request executed failed", function() {
+  client.assert(response.status === 403, "Response status is not 403");
+});
+%}
+
+###
+GET http://127.0.0.1:8000/to_dec?num=ABS&from_base=16
+
+> {%
+client.test("Request executed failed", function() {
+  client.assert(response.status === 403, "Response status is not 403");
+});
+%}
+
+###
+GET http://127.0.0.1:8000/to_dec?num=ABCDEF&from_base=16
+
+> {%
+client.test("Value right", function() {
+  client.assert(response.body.result == "11259375", "Value wrong");
+});
+%}
