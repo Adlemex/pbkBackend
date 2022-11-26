@@ -1,7 +1,10 @@
+import re
 from typing import Union
 
 import fastapi
 from fastapi import FastAPI, HTTPException
+
+import Truths
 
 app = FastAPI()
 
@@ -102,6 +105,7 @@ def division(num1: str, num2: str, base1: int, base2: int):
     steps.append("Делим полученные результаты")
     return num1 / num2, steps
 
+
 @app.get("/subtraction")
 def subtraction(num1: str, num2: str, base1: int, base2: int):
     steps = []
@@ -117,3 +121,9 @@ def subtraction(num1: str, num2: str, base1: int, base2: int):
         steps += res2.get("steps")
     steps.append("Вычитаем полученные результаты")
     return num1 - num2, steps
+
+
+@app.get("/truth")
+def truth_table(funcs: str):
+    variables = sorted(set(re.findall(r"[A-Za-z]", funcs)))
+    return { "data": Truths.Truths(list(variables), [funcs]).to_list()}
