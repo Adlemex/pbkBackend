@@ -157,7 +157,7 @@ class Truths(object):
         t = []
         t.append(self.bases + self.phrases)
         for conditions_set in self.base_conditions:
-            t.append(self.calculate(*conditions_set))
+            t.append(list(map(str, self.calculate(*conditions_set))))
         return t
 
 

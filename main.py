@@ -136,6 +136,7 @@ def truth_table(funcs: str, response: Response):
     variables = sorted(set(re.findall(r"[A-Za-z]", funcs)))
     try:
         data = Truths.Truths(list(variables), [funcs]).to_list()
+        print(data)
         return {"data": data}
     except Exception:
         return "Неверный ввод"
