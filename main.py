@@ -25,7 +25,7 @@ app = FastAPI()
 
 @app.get("/from_dec")
 def from_dec(num: int, to_base: int, response: Response):
-    response.headers = {"Cache-Control": "max-age=31536000, immutable"}
+    response.headers["Cache-Control"] = "max-age=31536000, immutable"
     if to_base > 36: raise HTTPException(403, "Слишком большая система счисления")
     from_dec.t = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     r = ''
@@ -39,7 +39,7 @@ def from_dec(num: int, to_base: int, response: Response):
 
 @app.get("/to_dec")
 def to_dec(num: str, from_base: int, response: Response):
-    response.headers = {"Cache-Control": "max-age=31536000, immutable"}
+    response.headers["Cache-Control"] = "max-age=31536000, immutable"
     if from_base > 36: raise HTTPException(403, "Слишком большая система счисления")
     to_dec.t = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     n = num
@@ -60,7 +60,7 @@ def to_dec(num: str, from_base: int, response: Response):
 
 @app.get("/sum")
 def sum(num1: str, num2: str, base1: int, base2: int, response: Response):
-    response.headers = {"Cache-Control": "max-age=31536000, immutable"}
+    response.headers["Cache-Control"] = "max-age=31536000, immutable"
     steps = []
     steps.append("Переводим первое число в десятичную систему")
     if base1 != 10:
@@ -78,7 +78,7 @@ def sum(num1: str, num2: str, base1: int, base2: int, response: Response):
 
 @app.get("/multiplication")
 def multiplication(num1: str, num2: str, base1: int, base2: int, response: Response):
-    response.headers = {"Cache-Control": "max-age=31536000, immutable"}
+    response.headers["Cache-Control"] = "max-age=31536000, immutable"
     steps = []
     steps.append("Переводим первое число в десятичную систему")
     if base1 != 10:
@@ -96,7 +96,7 @@ def multiplication(num1: str, num2: str, base1: int, base2: int, response: Respo
 
 @app.get("/division")
 def division(num1: str, num2: str, base1: int, base2: int, response: Response):
-    response.headers = {"Cache-Control": "max-age=31536000, immutable"}
+    response.headers["Cache-Control"] = "max-age=31536000, immutable"
     steps = []
     steps.append("Переводим первое число в десятичную систему")
     if base1 != 10:
@@ -114,7 +114,7 @@ def division(num1: str, num2: str, base1: int, base2: int, response: Response):
 
 @app.get("/subtraction")
 def subtraction(num1: str, num2: str, base1: int, base2: int, response: Response):
-    response.headers = {"Cache-Control": "max-age=31536000, immutable"}
+    response.headers["Cache-Control"] = "max-age=31536000, immutable"
     steps = []
     steps.append("Переводим первое число в десятичную систему")
     if base1 != 10:
@@ -132,6 +132,6 @@ def subtraction(num1: str, num2: str, base1: int, base2: int, response: Response
 
 @app.get("/truth")
 def truth_table(funcs: str, response: Response):
-    response.headers = {"Cache-Control": "max-age=31536000, immutable"}
+    response.headers["Cache-Control"] = "max-age=31536000, immutable"
     variables = sorted(set(re.findall(r"[A-Za-z]", funcs)))
     return { "data": Truths.Truths(list(variables), [funcs]).to_list()}
