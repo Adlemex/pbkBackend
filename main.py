@@ -134,4 +134,8 @@ def subtraction(num1: str, num2: str, base1: int, base2: int, response: Response
 def truth_table(funcs: str, response: Response):
     response.headers["Cache-Control"] = "max-age=31536000, immutable"
     variables = sorted(set(re.findall(r"[A-Za-z]", funcs)))
-    return { "data": Truths.Truths(list(variables), [funcs]).to_list()}
+    try:
+        data = Truths.Truths(list(variables), [funcs]).to_list()
+        return {"data": data}
+    except Exception:
+        return "Неверный ввод"
