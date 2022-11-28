@@ -2,8 +2,8 @@ import re
 from typing import Union
 
 import fastapi
-from fastapi import FastAPI, HTTPException
-from fastapi.openapi.models import Response
+from fastapi import FastAPI, HTTPException, Response
+
 
 import Truths
 
