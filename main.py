@@ -4,7 +4,6 @@ from typing import Union
 import fastapi
 from fastapi import FastAPI, HTTPException, Response
 
-
 import Truths
 
 app = FastAPI()
@@ -140,3 +139,11 @@ def truth_table(funcs: str, response: Response):
         return {"data": data}
     except Exception:
         return "Неверный ввод"
+
+
+@app.get("/ch_bases")
+def ch_bases(num: str, from_base: int, to_base: int, response: Response):
+    if from_base == "10": return from_dec(int(num), to_base, response)
+    if to_base == "10": return to_dec(num, from_base, response)
+    dec = to_dec(num, from_base, response).get("result")
+    return from_dec(dec, to_base, response)
