@@ -33,6 +33,7 @@ def from_dec(num: int, to_base: int, response: Response):
         steps.append(str(num) + ":" + str(to_base) + " ост: " + str(divmod(num, to_base)[1]))
         num, y = divmod(num, to_base)
         r = from_dec.t[y] + r
+    steps.append("Смотрим остатки сверху вниз: " + r)
     return {"result": r, "steps": steps}
 
 
@@ -143,12 +144,11 @@ def truth_table(funcs: str, response: Response):
 
 @app.get("/ch_bases")
 def ch_bases(num: str, from_base: int, to_base: int, response: Response):
-    if from_base == "10": return from_dec(int(num), to_base, response)
-    if to_base == "10": return to_dec(num, from_base, response)
-    steps = []
-    steps.append("Переводим в десятичную систему")
+    if from_base == 10: return from_dec(int(num), to_base, response)
+    if to_base == 10: return to_dec(num, from_base, response)
+    steps = ["Переводим в десятичную систему"]
     dec = to_dec(num, from_base, response)
-    steps = dec.get("steps")
+    steps += dec.get("steps")
     dec = dec.get("result")
     new = from_dec(dec, to_base, response)
     steps.append(f"Переводим в {to_base}-ичную систему")
