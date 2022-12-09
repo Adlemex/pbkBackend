@@ -145,5 +145,12 @@ def truth_table(funcs: str, response: Response):
 def ch_bases(num: str, from_base: int, to_base: int, response: Response):
     if from_base == "10": return from_dec(int(num), to_base, response)
     if to_base == "10": return to_dec(num, from_base, response)
-    dec = to_dec(num, from_base, response).get("result")
-    return from_dec(dec, to_base, response)
+    steps = []
+    steps.append("Переводим в десятичную систему")
+    dec = to_dec(num, from_base, response)
+    steps = dec.get("steps")
+    dec = dec.get("result")
+    new = from_dec(dec, to_base, response)
+    steps.append(f"Переводим в {to_base}-ичную систему")
+    steps += new.get("steps")
+    return {"result": new.get("result"), "steps": steps}
