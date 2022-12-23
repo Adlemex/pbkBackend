@@ -204,5 +204,5 @@ def ch_bases(num: str, from_base: int, to_base: int, response: Response):
     new = from_dec(int(dec.result), to_base, response)
     for block in new.blocks:
         ans.blocks.append(block)
-    res = new.result
+    ans.result = new.result
     return ans
