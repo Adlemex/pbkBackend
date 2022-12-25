@@ -81,6 +81,11 @@ def calc(num1: str, num2: str, base1: int, base2: int, action: str, end_base: in
         num2 = res2.result
         for blockk in res2.blocks:
             ans.blocks.append(blockk)
+    try:
+        num1 = int(num1)
+        num2 = int(num2)
+    except ValueError:
+        raise HTTPException("Введеные значения не числа")
     if action == "sum":
         block = Block(title="Складываем полученные числа")
         block.steps.append(f"{num1} + {num2} = {num1+num2}")
