@@ -59,7 +59,7 @@ def to_dec(num: str, from_base: int, response: Response, text: str =
         res = res + to_dec.t.index(numm) * from_base ** size
         summa.append(str(to_dec.t.index(numm) * from_base ** size))
         size = size - 1
-    ans.blocks.append(Block(title="Складывание результата"))
+    ans.blocks.append(Block(title="Сложение результата"))
     ans.blocks[1].steps.append(f"{' + '.join(summa)} = {res}")
     ans.result = res
     return ans
