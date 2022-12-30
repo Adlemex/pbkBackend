@@ -80,18 +80,18 @@ def group_operations(p):
     if isinstance(p, list):
         if len(p) == 1:
             return p
-        for x in ['not', '~', '-']:
+        for x in ['not', '~', '-', '¬']:
             while x in p:
                 index = p.index(x)
                 p[index] = [x, group_operations(p[index + 1])]
                 p.pop(index + 1)
-        for x in ['and', 'nand', 'xand']:
+        for x in ['and', 'nand', 'xand', '∧']:
             while x in p:
                 index = p.index(x)
                 p[index] = [group_operations(p[index - 1]), x, group_operations(p[index + 1])]
                 p.pop(index + 1)
                 p.pop(index - 1)
-        for x in ['or', 'nor', 'xor']:
+        for x in ['or', 'nor', 'xor', '∨', '⊕']:
             while x in p:
                 index = p.index(x)
                 p[index] = [group_operations(p[index - 1]), x, group_operations(p[index + 1])]
