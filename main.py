@@ -1,10 +1,10 @@
 import re
 from typing import Union
-
-import fastapi
+from bs4 import BeautifulSoup
 from fastapi import FastAPI, HTTPException, Response
 from Resp import Resp, Block
 import Truths
+import requests
 
 app = FastAPI()
 
@@ -197,6 +197,53 @@ def truth_table(funcs: str, response: Response):
     except Exception:
         return "Неверный ввод"
 
+@app.get("/karnaugh_map")
+def karnaugh_map(funcs: str, response: Response):
+    response.headers["Cache-Control"] = "max-age=31536000, immutable"
+    replacement = {"∧": 3, "∨": 4, "->": 5, "⇔": 6, "⊕": 7}
+    if funcs.count("¬") > 0: raise HTTPException(400, "К сожалению символ ¬, пока не поддерживается")
+    for key in replacement.keys():
+        funcs = funcs.replace(key, str(replacement.get(key)))
+    url = f"https://tablica-istinnosti.ru/ru/kkn.php?dp={funcs}&fn=0&f3=1&fk=0&fd=0&fe=1&in="
+    response = requests.get(url)
+    if (response.status_code != 200): raise HTTPException(400, "Сервер не отвечает")
+    bs = BeautifulSoup(response.text, "lxml")
+    table = bs.find("table", {"style": "font-family:ddd;color:black;"})
+    if table is None: raise HTTPException(400, "Неверный ввод")
+    data = []
+    for row in table.find_all("tr"):
+        row_data = []
+        for item in row.find_all("td"):
+            row_data.append(item.text)
+        data.append(row_data)
+    return data
+
+@app.get("/sdnf_sknf")
+def sdnf_sknf(funcs: str, response: Response):
+    response.headers["Cache-Control"] = "max-age=31536000, immutable"
+    replacement = {"∧": 3, "∨": 4, "->": 5, "⇔": 6, "⊕": 7}
+    if funcs.count("¬") > 0: raise HTTPException(400, "К сожалению символ ¬, пока не поддерживается")
+    for key in replacement.keys():
+        funcs = funcs.replace(key, str(replacement.get(key)))
+    url = f"https://tablica-istinnosti.ru/ru/ssn.php?dp={funcs}&fn=0&f3=1&fk=0&fd=0&fe=1&in="
+    response = requests.get(url)
+    if (response.status_code != 200): raise HTTPException(400, "Сервер не отвечает")
+    bs = BeautifulSoup(response.text, "lxml")
+    sknf_table = bs.find(string=
+                         "В результате, совершенная конъюнктивно-нормальная форма (СКНФ) нашей функции равна:") \
+        .nextSibling
+    sdnf_table = bs.find(string=
+                         "В результате, совершенная дизъюнктивно-нормальная форма (СДНФ) нашей функции равна:") \
+        .nextSibling
+    if sknf_table is None: raise HTTPException(400, "Неверный ввод")
+    if sdnf_table is None: raise HTTPException(400, "Неверный ввод")
+    sknf = ""
+    for item in sknf_table.find_all("td"):
+        sknf += item.text
+    sdnf = ""
+    for item in sdnf_table.find_all("td"):
+        sdnf += item.text
+    return {"sknf": sknf, "sdnf": sdnf}
 
 @app.get("/ch_bases")
 def ch_bases(num: str, from_base: int, to_base: int, response: Response):
