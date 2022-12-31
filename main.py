@@ -204,7 +204,7 @@ def karnaugh_map(funcs: str, response: Response):
     if funcs.count("¬") > 0: raise HTTPException(400, "К сожалению символ ¬, пока не поддерживается")
     for key in replacement.keys():
         funcs = funcs.replace(key, str(replacement.get(key)))
-    url = f"https://tablica-istinnosti.ru/ru/kkn.php?dp={funcs}&fn=0&f3=1&fk=0&fd=0&fe=1&in="
+    url = f"https://tablica-istinnosti.ru/ru/kkn.php?dp={funcs}&fn=1&f3=1&fk=0&fd=0&fe=1&in="
     response = requests.get(url)
     if (response.status_code != 200): raise HTTPException(400, "Сервер не отвечает")
     bs = BeautifulSoup(response.text, "lxml")
@@ -225,7 +225,7 @@ def sdnf_sknf(funcs: str, response: Response):
     if funcs.count("¬") > 0: raise HTTPException(400, "К сожалению символ ¬, пока не поддерживается")
     for key in replacement.keys():
         funcs = funcs.replace(key, str(replacement.get(key)))
-    url = f"https://tablica-istinnosti.ru/ru/ssn.php?dp={funcs}&fn=0&f3=1&fk=0&fd=0&fe=1&in="
+    url = f"https://tablica-istinnosti.ru/ru/ssn.php?dp={funcs}&fn=1&f3=1&fk=0&fd=0&fe=1&in="
     response = requests.get(url)
     if (response.status_code != 200): raise HTTPException(400, "Сервер не отвечает")
     bs = BeautifulSoup(response.text, "lxml")
