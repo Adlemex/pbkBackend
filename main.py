@@ -245,19 +245,25 @@ def sdnf_sknf(funcs: str, response: Response):
         sdnf += item.text
     return {"sknf": sknf, "sdnf": sdnf}
 
+def chages(funcs: str, response: Response):
+    res = sdnf_sknf(funcs, response)
+    res.update({"simplified": simplify(funcs, response)})
+    return res
+
 @app.get("/simplify")
 def simplify(funcs: str, response: Response):
     response.headers["Cache-Control"] = "max-age=31536000, immutable"
     url = 'https://www.kontrolnaya-rabota.ru/krapi/add/input/?input={"expr":"' + funcs + '"}' \
     '&conf={"lang":"ru","format":"latex","use_latex":true,"choicer":true,"redirector":true,"img_width":3}&pod=mathlog.logic'
-    response = requests.get(url, timeout=5)
+    response = requests.get(url, timeout=3)
     json = response.json()
     if json.get("error") is not None: raise HTTPException(400, "Неверный ввод")
     session = json.get("result").get('sessions').get('simplify') if json.get("result") is not None else None
     if session is None: raise HTTPException(400, "Неверный ввод")
     new_url = f"https://www.kontrolnaya-rabota.ru/krapi/v2/session/{session}/"
-    response = requests.get(new_url)
+    response = requests.get(new_url, timeout=5)
     json = response.json()
+    if response.status_code != 200: raise HTTPException(400, "Ошибка при получении результата")
     if json.get("error") is not None: raise HTTPException(400, "Ошибка при получении результата")
     result: str = json.get("result").get("simplify").get("subpods")[0].get("pprint")
     return {"result": result.upper()}
