@@ -227,7 +227,7 @@ def sdnf_sknf(funcs: str, response: Response):
         funcs = funcs.replace(key, str(replacement.get(key)))
     url = f"https://tablica-istinnosti.ru/ru/ssn.php?dp={funcs}&fn=1&f3=1&fk=0&fd=0&fe=1&in="
     response = requests.get(url)
-    if (response.status_code != 200): raise HTTPException(400, "Сервер не отвечает")
+    if (response.status_code != 200): raise HTTPException(404, "Сервер не отвечает")
     bs = BeautifulSoup(response.text, "lxml")
     sknf_table = bs.find(string=
                          "В результате, совершенная конъюнктивно-нормальная форма (СКНФ) нашей функции равна:") \
@@ -235,8 +235,8 @@ def sdnf_sknf(funcs: str, response: Response):
     sdnf_table = bs.find(string=
                          "В результате, совершенная дизъюнктивно-нормальная форма (СДНФ) нашей функции равна:") \
         .nextSibling
-    if sknf_table is None: raise HTTPException(400, "Неверный ввод")
-    if sdnf_table is None: raise HTTPException(400, "Неверный ввод")
+    if sknf_table is None: raise HTTPException(421, "Неверный ввод")
+    if sdnf_table is None: raise HTTPException(421, "Неверный ввод")
     sknf = ""
     for item in sknf_table.find_all("td"):
         sknf += item.text
@@ -257,16 +257,16 @@ def simplify(funcs: str, response: Response):
     '&conf={"lang":"ru","format":"latex","use_latex":true,"choicer":true,"redirector":true,"img_width":3}&pod=mathlog.logic'
     response = requests.get(url, timeout=3)
     json = response.json()
-    if json.get("error") is not None: raise HTTPException(400, "Неверный ввод")
+    if json.get("error") is not None: raise HTTPException(421, "Неверный ввод")
     session = json.get("result").get('sessions').get('simplify') if json.get("result") is not None else None
-    if session is None: raise HTTPException(400, "Неверный ввод")
+    if session is None: raise HTTPException(421, "Неверный ввод")
     new_url = f"https://www.kontrolnaya-rabota.ru/krapi/v2/session/{session}/"
     response = requests.get(new_url, timeout=5)
     json = response.json()
-    if response.status_code != 200: raise HTTPException(400, "Ошибка при получении результата")
-    if json.get("error") is not None: raise HTTPException(400, "Ошибка при получении результата")
+    if response.status_code != 200: raise HTTPException(412, "Ошибка при получении результата")
+    if json.get("error") is not None: raise HTTPException(412, "Ошибка при получении результата")
     result: str = json.get("result").get("simplify").get("subpods")[0].get("pprint")
-    return {"result": result.upper()}
+    return result.upper()
 
 
 @app.get("/ch_bases")
