@@ -201,22 +201,22 @@ def truth_table(funcs: str, response: Response):
 def karnaugh_map(funcs: str, response: Response):
     response.headers["Cache-Control"] = "max-age=31536000, immutable"
     replacement = {"∧": 3, "∨": 4, "->": 5, "⇔": 6, "⊕": 7}
-    if funcs.count("¬") > 0: raise HTTPException(400, "К сожалению символ ¬, пока не поддерживается")
+    if funcs.count("¬") > 0: raise HTTPException(403, "К сожалению символ ¬, пока не поддерживается")
     for key in replacement.keys():
         funcs = funcs.replace(key, str(replacement.get(key)))
     url = f"https://tablica-istinnosti.ru/ru/kkn.php?dp={funcs}&fn=1&f3=1&fk=0&fd=0&fe=1&in="
     response = requests.get(url)
-    if (response.status_code != 200): raise HTTPException(400, "Сервер не отвечает")
+    if (response.status_code != 200): raise HTTPException(500, "Сервер не отвечает")
     bs = BeautifulSoup(response.text, "lxml")
     table = bs.find("table", {"style": "font-family:ddd;color:black;"})
-    if table is None: raise HTTPException(400, "Неверный ввод")
+    if table is None: raise HTTPException(421, "Неверный ввод")
     data = []
     for row in table.find_all("tr"):
         row_data = []
         for item in row.find_all("td"):
             row_data.append(item.text)
         data.append(row_data)
-    return data
+    return {"data": data}
 
 @app.get("/sdnf_sknf")
 def sdnf_sknf(funcs: str, response: Response):
@@ -244,8 +244,8 @@ def sdnf_sknf(funcs: str, response: Response):
     for item in sdnf_table.find_all("td"):
         sdnf += item.text
     return {"sknf": sknf, "sdnf": sdnf}
-
-def chages(funcs: str, response: Response):
+@app.get("/changes")
+def changes(funcs: str, response: Response):
     res = sdnf_sknf(funcs, response)
     res.update({"simplified": simplify(funcs, response)})
     return res
